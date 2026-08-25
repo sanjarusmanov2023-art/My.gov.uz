@@ -17,10 +17,15 @@ from logos import mygov_logo, uz_emblem
 
 # --- Fonts (support Latin + Cyrillic) ---
 FONT = 'Helvetica'
-for cand in (r'C:\Windows\Fonts\arial.ttf', r'C:\Windows\Fonts\calibri.ttf'):
+FONT_BOLD = 'Helvetica-Bold'
+for cand, cand_b in ((r'C:\Windows\Fonts\arial.ttf', r'C:\Windows\Fonts\arialbd.ttf'),
+                     (r'C:\Windows\Fonts\calibri.ttf', r'C:\Windows\Fonts\calibrib.ttf')):
     try:
-        pdfmetrics.registerFont(TTFont('UZ', cand)); FONT='UZ'; break
-    except Exception: pass
+        pdfmetrics.registerFont(TTFont('UZ', cand)); FONT='UZ'
+        pdfmetrics.registerFont(TTFont('UZ-Bold', cand_b)); FONT_BOLD='UZ-Bold'
+        break
+    except Exception:
+        pass
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 
@@ -36,7 +41,7 @@ def _styles():
         'title': s('title', fontSize=13, leading=16, alignment=TA_CENTER),
         'subtitle': s('subtitle', fontSize=10, leading=13, alignment=TA_CENTER),
         'lab': s('lab', fontSize=8.5, leading=11),
-        'labb': s('labb', fontSize=8.5, leading=11),
+        'labb': s('labb', fontSize=8.5, leading=11, fontName=FONT_BOLD),
         'val': s('val', fontSize=8.5, leading=11),
         'note': s('note', fontSize=7, leading=9),
         'sec': s('sec', fontSize=9, leading=12, alignment=TA_CENTER),
@@ -197,10 +202,17 @@ def generate_qaydvarag(data, lang='uz'):
     block(T['sec3'], rows3)
     block(T['sec4'], rows4)
     story.append(Spacer(1,6))
-    qr = make_qr(f"doc:{docno}")
-    story.append(qr)
-    story.append(Paragraph(_legal_note(lang), st['note']))
-    story.append(Paragraph(f"[{docno[-4:]}]", st['note']))
+    qr = make_qr(docno)
+    code_para = Paragraph("[" + docno[-4:] + "]", st['note'])
+    qr_cell = Table([[qr],[code_para]], colWidths=[28*mm])
+    qr_cell.setStyle(TableStyle([('ALIGN',(0,0),(0,0),'CENTER'),('ALIGN',(0,1),(0,1),'CENTER'),
+        ('TOPPADDING',(0,0),(-1,-1),0),('BOTTOMPADDING',(0,0),(-1,-1),0)]))
+    legal = Paragraph(_legal_note(lang), st['note'])
+    ft = Table([[legal, qr_cell]], colWidths=[120*mm, 44*mm])
+    ft.setStyle(TableStyle([('VALIGN',(0,0),(-1,-1),'MIDDLE'),('ALIGN',(1,0),(1,0),'RIGHT'),
+        ('LEFTPADDING',(0,0),(-1,-1),0),('RIGHTPADDING',(0,0),(-1,-1),0),
+        ('TOPPADDING',(0,0),(-1,-1),0),('BOTTOMPADDING',(0,0),(-1,-1),0)]))
+    story.append(ft)
     doc.build(story)
     buf.seek(0)
     return buf.getvalue(), docno
@@ -248,9 +260,17 @@ def generate_employment(data, lang='uz'):
         ('LEFTPADDING',(0,0),(-1,-1),3),('RIGHTPADDING',(0,0),(-1,-1),3)]))
     story.append(t)
     story.append(Spacer(1,8))
-    story.append(make_qr(f"doc:{docno}"))
-    story.append(Paragraph(_legal_note(lang), st['note']))
-    story.append(Paragraph(f"[{docno[-4:]}]", st['note']))
+    qr = make_qr(docno)
+    code_para = Paragraph("[" + docno[-4:] + "]", st['note'])
+    qr_cell = Table([[qr],[code_para]], colWidths=[28*mm])
+    qr_cell.setStyle(TableStyle([('ALIGN',(0,0),(0,0),'CENTER'),('ALIGN',(0,1),(0,1),'CENTER'),
+        ('TOPPADDING',(0,0),(-1,-1),0),('BOTTOMPADDING',(0,0),(-1,-1),0)]))
+    legal = Paragraph(_legal_note(lang), st['note'])
+    ft = Table([[legal, qr_cell]], colWidths=[120*mm, 44*mm])
+    ft.setStyle(TableStyle([('VALIGN',(0,0),(-1,-1),'MIDDLE'),('ALIGN',(1,0),(1,0),'RIGHT'),
+        ('LEFTPADDING',(0,0),(-1,-1),0),('RIGHTPADDING',(0,0),(-1,-1),0),
+        ('TOPPADDING',(0,0),(-1,-1),0),('BOTTOMPADDING',(0,0),(-1,-1),0)]))
+    story.append(ft)
     doc.build(story)
     buf.seek(0); return buf.getvalue(), docno
 
@@ -311,9 +331,17 @@ def generate_salary(data, lang='en'):
         ('LEFTPADDING',(0,0),(-1,-1),3),('RIGHTPADDING',(0,0),(-1,-1),3)]))
     story.append(t)
     story.append(Spacer(1,8))
-    story.append(make_qr(f"doc:{docno}"))
-    story.append(Paragraph(_legal_note(lang), st['note']))
-    story.append(Paragraph(f"[{docno[-4:]}]", st['note']))
+    qr = make_qr(docno)
+    code_para = Paragraph("[" + docno[-4:] + "]", st['note'])
+    qr_cell = Table([[qr],[code_para]], colWidths=[28*mm])
+    qr_cell.setStyle(TableStyle([('ALIGN',(0,0),(0,0),'CENTER'),('ALIGN',(0,1),(0,1),'CENTER'),
+        ('TOPPADDING',(0,0),(-1,-1),0),('BOTTOMPADDING',(0,0),(-1,-1),0)]))
+    legal = Paragraph(_legal_note(lang), st['note'])
+    ft = Table([[legal, qr_cell]], colWidths=[120*mm, 44*mm])
+    ft.setStyle(TableStyle([('VALIGN',(0,0),(-1,-1),'MIDDLE'),('ALIGN',(1,0),(1,0),'RIGHT'),
+        ('LEFTPADDING',(0,0),(-1,-1),0),('RIGHTPADDING',(0,0),(-1,-1),0),
+        ('TOPPADDING',(0,0),(-1,-1),0),('BOTTOMPADDING',(0,0),(-1,-1),0)]))
+    story.append(ft)
     doc.build(story)
     buf.seek(0); return buf.getvalue(), docno
 
@@ -414,14 +442,17 @@ def generate_student(data, lang='uz'):
     story.append(Spacer(1,8))
     story.append(Paragraph(T['note_line'], st['note']))
     story.append(Spacer(1,8))
-    qr = make_qr(f"doc:{docno}")
+    qr = make_qr(docno)
+    code_para = Paragraph("[" + docno[-4:] + "]", st['note'])
+    qr_cell = Table([[qr],[code_para]], colWidths=[28*mm])
+    qr_cell.setStyle(TableStyle([('ALIGN',(0,0),(0,0),'CENTER'),('ALIGN',(0,1),(0,1),'CENTER'),
+        ('TOPPADDING',(0,0),(-1,-1),0),('BOTTOMPADDING',(0,0),(-1,-1),0)]))
     legal = Paragraph(_legal_note(lang), st['note'])
-    ft = Table([[legal, qr]], colWidths=[120*mm, 44*mm])
+    ft = Table([[legal, qr_cell]], colWidths=[120*mm, 44*mm])
     ft.setStyle(TableStyle([('VALIGN',(0,0),(-1,-1),'MIDDLE'),('ALIGN',(1,0),(1,0),'RIGHT'),
         ('LEFTPADDING',(0,0),(-1,-1),0),('RIGHTPADDING',(0,0),(-1,-1),0),
         ('TOPPADDING',(0,0),(-1,-1),0),('BOTTOMPADDING',(0,0),(-1,-1),0)]))
     story.append(ft)
-    story.append(Paragraph(f"[{docno[-4:]}]", st['note']))
     doc.build(story)
     buf.seek(0); return buf.getvalue(), docno
 
