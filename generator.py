@@ -145,7 +145,7 @@ def generate_qaydvarag(data, lang='uz'):
         (T['hdr'][4], d.get('org_form','')),
         (T['hdr'][5], d.get('own_form','')),
         (T['hdr'][6], d.get('activity','')),
-        (T['hdr'][7], d.get('gov_body','')),
+        (T['hdr'][7], d.get('gov_body','') or '—'),
         (T['hdr'][8], d.get('entity_type','')),
         (T['hdr'][9], d.get('charter_capital','')),
     ]
