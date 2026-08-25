@@ -14,22 +14,20 @@ from reportlab.pdfbase.ttfonts import TTFont
 import qrcode
 from PIL import Image as PILImage
 
-# --- Fonts: use DejaVuSans (ships with reportlab deps, supports Latin+Cyrillic) ---
-# This works identically on local Windows and on Render (Linux) — no system font dependency.
-FONT = 'Helvetica'
-for pattern in ('*/site-packages/reportlab/fonts/DejaVuSans.ttf',
-               '*/reportlab/fonts/DejaVuSans.ttf',
-               'C:/Windows/Fonts/arial.ttf'):
-    matches = glob.glob(pattern, recursive=True)
-    if matches:
-        try:
-            pdfmetrics.registerFont(TTFont('UZ', matches[0]))
-            FONT = 'UZ'
-            break
-        except Exception:
-            pass
-
 BASE = os.path.dirname(os.path.abspath(__file__))
+
+# --- Fonts: load Arial from repo assets (works on local + Render) ---
+FONT = 'Helvetica'
+FONT_BOLD = 'Helvetica-Bold'
+_arial = os.path.join(BASE, 'assets', 'arial.ttf')
+_arial_b = os.path.join(BASE, 'assets', 'arialbd.ttf')
+if os.path.exists(_arial):
+    try:
+        pdfmetrics.registerFont(TTFont('UZ', _arial)); FONT = 'UZ'
+        if os.path.exists(_arial_b):
+            pdfmetrics.registerFont(TTFont('UZ-Bold', _arial_b)); FONT_BOLD = 'UZ-Bold'
+    except Exception:
+        pass
 
 def _styles():
     ss = getSampleStyleSheet()
@@ -46,7 +44,7 @@ def _styles():
         'labb': s('labb', fontSize=8.5, leading=11),
         'val': s('val', fontSize=8.5, leading=11),
         'note': s('note', fontSize=7, leading=9),
-        'bigcode': s('bigcode', fontSize=28, leading=30, alignment=TA_LEFT),
+        'bigcode': s('bigcode', fontSize=28, leading=30, alignment=TA_LEFT, fontName=FONT_BOLD),
         'sec': s('sec', fontSize=9, leading=12, alignment=TA_CENTER),
     }
 
