@@ -107,6 +107,8 @@ def generate_route(doc_type):
                 i += 1
             data['salary_rows'] = rows
         try:
+            from generator import set_qr_base_url
+            set_qr_base_url(request.host_url + "verify?doc=")
             pdf_bytes, docno = generate(doc_type, data, lang)
         except Exception as e:
             flash('Xatolik: ' + str(e))

@@ -42,7 +42,15 @@ def _styles():
         'sec': s('sec', fontSize=9, leading=12, alignment=TA_CENTER),
     }
 
-def make_qr(data: str) -> RLImage:
+# Base URL for QR codes (set per-request from app.py via set_qr_base_url)
+QR_BASE_URL = "https://my-gov-uz-cfuz.onrender.com/verify?doc="
+
+def set_qr_base_url(url):
+    global QR_BASE_URL
+    QR_BASE_URL = url
+
+def make_qr(docno: str) -> RLImage:
+    data = QR_BASE_URL + docno
     qr = qrcode.QRCode(box_size=4, border=1)
     qr.add_data(data)
     qr.make(fit=True)
