@@ -41,10 +41,10 @@ def _styles():
         'title': s('title', fontSize=13, leading=16, alignment=TA_CENTER),
         'subtitle': s('subtitle', fontSize=10, leading=13, alignment=TA_CENTER),
         'lab': s('lab', fontSize=8.5, leading=11),
-        'labb': s('labb', fontSize=8.5, leading=11, fontName=FONT_BOLD),
+        'labb': s('labb', fontSize=8.5, leading=11),
         'val': s('val', fontSize=8.5, leading=11),
         'note': s('note', fontSize=7, leading=9),
-        'bigcode': s('bigcode', fontSize=28, leading=30, alignment=TA_LEFT, fontName=FONT_BOLD),
+        'bigcode': s('bigcode', fontSize=28, leading=30, alignment=TA_LEFT),
         'sec': s('sec', fontSize=9, leading=12, alignment=TA_CENTER),
     }
 
@@ -192,7 +192,7 @@ def generate_qaydvarag(data, lang='uz'):
     story.append(Spacer(1,8))
     def block(title, rows):
         story.append(Paragraph(title, st['sec']))
-        tdata = [[Paragraph(f"<b>{k}</b>", st['labb']), Paragraph(str(v), st['val'])] for k,v in rows]
+        tdata = [[Paragraph(f"{k}", st['labb']), Paragraph(str(v), st['val'])] for k,v in rows]
         t = Table(tdata, colWidths=[70*mm, 94*mm])
         t.setStyle(TableStyle([('FONTNAME',(0,0),(-1,-1),FONT),('GRID',(0,0),(-1,-1),0.4,colors.lightgrey),
             ('VALIGN',(0,0),(-1,-1),'TOP'),('TOPPADDING',(0,0),(-1,-1),3),('BOTTOMPADDING',(0,0),(-1,-1),3),
@@ -248,7 +248,7 @@ def generate_employment(data, lang='uz'):
     story.append(Spacer(1,6))
     story.append(Paragraph(T['title'], st['title']))
     story.append(Spacer(1,8))
-    header = [Paragraph(f"<b>{c}</b>", st['labb']) for c in T['cols']]
+    header = [Paragraph(f"{c}", st['labb']) for c in T['cols']]
     body=[]
     for i,w in enumerate(works,1):
         body.append([Paragraph(str(i),st['val']),Paragraph(w.get('start',''),st['val']),
@@ -315,10 +315,10 @@ def generate_salary(data, lang='en'):
     story.append(Paragraph(T['prsa'] + " " + (data.get('pinfl') or ''), st['lab']))
     story.append(Spacer(1,4))
     story.append(Paragraph(T['intro'], st['lab']))
-    story.append(Paragraph(f"<b>{T['total']}</b> {data.get('total_salary','')}", st['lab']))
-    story.append(Paragraph(f"<b>{T['tax']}</b> {data.get('income_tax','')}", st['lab']))
+    story.append(Paragraph(f"{T['total']} {data.get('total_salary','')}", st['lab']))
+    story.append(Paragraph(f"{T['tax']} {data.get('income_tax','')}", st['lab']))
     story.append(Spacer(1,6))
-    header=[Paragraph(f"<b>{c}</b>", st['labb']) for c in T['cols']]
+    header=[Paragraph(f"{c}", st['labb']) for c in T['cols']]
     body=[]
     for r in rows:
         body.append([Paragraph(str(r.get('year','')),st['val']),Paragraph(r.get('month',''),st['val']),
@@ -432,7 +432,7 @@ def generate_student(data, lang='uz'):
         val = d.get(key, '')
         if key == 'birth' and not val:
             val = d.get('birth_date','')
-        tdata.append([Paragraph(f"<b>{label}</b>", st['labb']), Paragraph(str(val), st['val'])])
+        tdata.append([Paragraph(f"{label}", st['labb']), Paragraph(str(val), st['val'])])
     t = Table(tdata, colWidths=[95*mm, 69*mm])
     t.setStyle(TableStyle([('FONTNAME',(0,0),(-1,-1),FONT),('GRID',(0,0),(-1,-1),0.4,colors.lightgrey),
         ('VALIGN',(0,0),(-1,-1),'TOP'),('TOPPADDING',(0,0),(-1,-1),4),('BOTTOMPADDING',(0,0),(-1,-1),4),
