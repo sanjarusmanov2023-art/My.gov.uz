@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tasdiqlash</title>
+<style>
+  body { margin:0; font-family:'Segoe UI',Arial,sans-serif; background:#f3f5f8; color:#222; }
+  .topbar { background:#1a6fb5; color:#fff; padding:14px 20px; }
+  .wrap { max-width:600px; margin:50px auto; padding:0 20px; }
+  .box { background:#fff; border-radius:8px; padding:30px; box-shadow:0 2px 12px rgba(0,0,0,.08); text-align:center; }
+  .ok { color:#1e8449; font-size:50px; }
+  .no { color:#c0392b; font-size:50px; }
+  h2 { color:#1a6fb5; }
+  code { background:#eef; padding:3px 8px; border-radius:4px; font-size:15px; }
+  a { color:#1a6fb5; }
+</style>
+</head>
+<body>
+  <div class="topbar">🏛 Hujjat Generator — tasdiqlash</div>
+  <div class="wrap">
+    {% if found %}
+      <div class="box">
+        <div class="ok">✓</div>
+        <h2>Hujjat topildi</h2>
+        <p>Hujjat raqami: <code>{{ doc }}</code></p>
+        <p>Turi: {{ info.doc_type }} | Til: {{ info.lang }}</p>
+        <p>Yaratilgan: {{ info.created }}</p>
+        <p style="color:#666; font-size:13px;">Bu sahifa QR-kod orqali ochilgan. Hujjat aslida tizim ichida generatsiya qilingan nusxa.</p>
+      </div>
+    {% else %}
+      <div class="box">
+        <div class="no">✗</div>
+        <h2>Hujjat topilmadi</h2>
+        <p>Berilgan raqam bo'yicha yozuv mavjud emas yoki muddati tugagan.</p>
+      </div>
+    {% endif %}
+  </div>
+</body>
+</html>

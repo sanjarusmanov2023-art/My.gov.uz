@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yaratish</title>
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:'Segoe UI',Arial,sans-serif; background:#f3f5f8; color:#222; }
+  .topbar { background:#1a6fb5; color:#fff; padding:14px 20px; display:flex; justify-content:space-between; align-items:center; }
+  .topbar a { color:#fff; text-decoration:none; font-size:14px; }
+  .wrap { max-width:760px; margin:30px auto; padding:0 20px 60px; }
+  h1 { color:#1a6fb5; }
+  .box { background:#fff; border-radius:8px; padding:24px; box-shadow:0 2px 12px rgba(0,0,0,.08); margin-bottom:18px; }
+  label { display:block; font-weight:600; margin:14px 0 4px; font-size:14px; }
+  input[type=text], select, textarea { width:100%; padding:9px; border:1px solid #ccd; border-radius:5px; font-size:14px; }
+  .row { display:flex; gap:12px; }
+  .row > div { flex:1; }
+  .row label { margin-top:0; }
+  fieldset { border:1px solid #dde; border-radius:6px; padding:12px 14px; margin-top:14px; }
+  legend { font-weight:700; color:#155a95; padding:0 6px; }
+  .repeat { background:#f7f9fc; border:1px dashed #cdd; border-radius:6px; padding:10px; margin-bottom:10px; }
+  button.gen { background:#1a6fb5; color:#fff; border:0; padding:13px 26px; border-radius:5px; font-size:16px; cursor:pointer; margin-top:18px; }
+  button.gen:hover { background:#155a95; }
+  .addbtn { background:#e8f0f8; color:#155a95; border:1px solid #bcd; padding:7px 12px; border-radius:5px; cursor:pointer; font-size:13px; margin-top:6px; }
+  .langsel { display:flex; gap:14px; align-items:center; margin-bottom:6px; }
+</style>
+<script>
+function addFounder(){ const c=document.getElementById('founders'); const i=c.children.length;
+  const d=document.createElement('div'); d.className='repeat';
+  d.innerHTML=`<div class="row"><div><label> Ta'sischining ismi</label><input type="text" name="founder_name_${i}"></div><div><label>Ulvhi (%)</label><input type="text" name="founder_pct_${i}" value="100"></div></div>`;
+  c.appendChild(d); }
+function addWork(){ const c=document.getElementById('works'); const i=c.children.length;
+  const d=document.createElement('div'); d.className='repeat';
+  d.innerHTML=`<div class="row"><div><label>Boshlanish sanasi</label><input type="text" name="work_start_${i}"></div><div><label>Tugash sanasi</label><input type="text" name="work_end_${i}"></div></div>
+  <div class="row"><div><label>Tashkilot</label><input type="text" name="work_org_${i}"></div><div><label>INN/STIR</label><input type="text" name="work_inn_${i}"></div></div>
+  <div class="row"><div><label>Lavozim</label><input type="text" name="work_position_${i}"></div><div><label>Bo'lim</label><input type="text" name="work_dept_${i}"></div></div>`;
+  c.appendChild(d); }
+function addSal(){ const c=document.getElementById('sal'); const i=c.children.length;
+  const d=document.createElement('div'); d.className='repeat';
+  d.innerHTML=`<div class="row"><div><label>Yil</label><input type="text" name="sal_year_${i}"></div><div><label>Oy</label><input type="text" name="sal_month_${i}"></div></div>
+  <div class="row"><div><label>Tashkilot</label><input type="text" name="sal_org_${i}"></div><div><label>Maosh (UZS)</label><input type="text" name="sal_wage_${i}"></div></div>
+  <div class="row"><div><label>Soliq (PIT)</label><input type="text" name="sal_pit_${i}"></div><div><label>INPS</label><input type="text" name="sal_inps_${i}"></div></div>
+  <div class="row"><div><label>Boshqa daromad</label><input type="text" name="sal_other_${i}" value="0"></div></div>`;
+  c.appendChild(d); }
+</script>
+</head>
+<body>
+  <div class="topbar">
+    <span>🏛 Hujjat Generator</span>
+    <a href="{{ url_for('dashboard') }}">← Orqaga</a>
+  </div>
+  <div class="wrap">
+    <h1>Yangi hujjat yaratish</h1>
+    <form method="post">
+      <div class="box">
+        <div class="langsel">
+          <label style="margin:0;">Til:</label>
+          {% for k,l in langs %}
+            <label style="font-weight:400; margin:0;"><input type="radio" name="lang" value="{{k}}" {% if k=='uz' %}checked{% endif %}> {{l}}</label>
+          {% endfor %}
+        </div>
+      </div>
+
+      {% if doc_type=='qaydvarag' %}
+      <div class="box">
+        <div class="row"><div><label>STIR</label><input type="text" name="stir"></div><div><label>Ro'yxatga olingan sana</label><input type="text" name="reg_date"></div></div>
+        <div class="row"><div><label>Ro'yxatdan o'tkazilgan raqami</label><input type="text" name="reg_no"></div><div><label>Yuridik shaxsning nomi</label><input type="text" name="entity_name"></div></div>
+        <div class="row"><div><label>Tashkiliy-huquqiy shakl</label><input type="text" name="org_form"></div><div><label>Mulkchilik shakli</label><input type="text" name="own_form"></div></div>
+        <div class="row"><div><label>Faoliyat turi</label><input type="text" name="activity"></div><div><label>Yuridik shaxs turi</label><input type="text" name="entity_type"></div></div>
+        <label>Ustav fondi</label><input type="text" name="charter_capital">
+        <div class="row"><div><label>Rahbarning F.I.SH.</label><input type="text" name="head_name"></div><div><label>Rahbarning STIR</label><input type="text" name="head_stir"></div></div>
+        <fieldset><legend>Ta'sischilar</legend><div id="founders"></div><button type="button" class="addbtn" onclick="addFounder()">+ Ta'sischi qo'shish</button></fieldset>
+        <div class="row"><div><label>Elektron pochta</label><input type="text" name="email"></div><div><label>Telefon</label><input type="text" name="phone"></div></div>
+        <div class="row"><div><label>Tuman</label><input type="text" name="district"></div><div><label>Manzil</label><input type="text" name="address"></div></div>
+        <div class="row"><div><label>JShShIR / PINFL</label><input type="text" name="pinfl"></div><div><label>Kimga berilgan</label><input type="text" name="issued_to"></div></div>
+        <label>Ariza raqami</label><input type="text" name="app_no">
+      </div>
+
+      {% elif doc_type=='employment' %}
+      <div class="box">
+        <div class="row"><div><label>Kimga berilgan (F.I.Sh.)</label><input type="text" name="issued_to"></div><div><label>JShShIR / PINFL</label><input type="text" name="pinfl"></div></div>
+        <label>Ariza raqami</label><input type="text" name="app_no">
+        <fieldset><legend>Ish joylari</legend><div id="works"></div><button type="button" class="addbtn" onclick="addWork()">+ Ish joyi qo'shish</button></fieldset>
+      </div>
+
+      {% elif doc_type=='salary' %}
+      <div class="box">
+        <div class="row"><div><label>Kimga berilgan (F.I.Sh.)</label><input type="text" name="issued_to"></div><div><label>PINFL</label><input type="text" name="pinfl"></div></div>
+        <div class="row"><div><label>Jami hisoblangan ish haqi</label><input type="text" name="total_salary"></div><div><label>Daromad solig'i</label><input type="text" name="income_tax"></div></div>
+        <label>Ariza raqami</label><input type="text" name="app_no">
+        <fieldset><legend>Oylik qatorlar</legend><div id="sal"></div><button type="button" class="addbtn" onclick="addSal()">+ Oylik qator qo'shish</button></fieldset>
+      </div>
+      {% endif %}
+
+      <button class="gen" type="submit">📄 PDF yaratish va yuklab olish</button>
+    </form>
+  </div>
+</body>
+</html>

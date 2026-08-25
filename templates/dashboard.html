@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:'Segoe UI',Arial,sans-serif; background:#f3f5f8; color:#222; }
+  .topbar { background:#1a6fb5; color:#fff; padding:14px 20px; display:flex; justify-content:space-between; align-items:center; }
+  .topbar a { color:#fff; text-decoration:none; font-size:14px; }
+  .wrap { max-width:800px; margin:40px auto; padding:0 20px; }
+  h1 { color:#1a6fb5; }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px; margin-top:24px; }
+  .card { background:#fff; border-radius:8px; padding:22px; box-shadow:0 2px 12px rgba(0,0,0,.08); cursor:pointer; transition:.2s; text-decoration:none; color:#222; display:block; }
+  .card:hover { transform:translateY(-3px); box-shadow:0 6px 18px rgba(0,0,0,.12); }
+  .card .ic { font-size:30px; }
+  .card h3 { margin:10px 0 4px; color:#1a6fb5; }
+  .card p { margin:0; color:#666; font-size:13px; }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <span>🏛 Hujjat Generator</span>
+    <a href="{{ url_for('logout') }}">Chiqish</a>
+  </div>
+  <div class="wrap">
+    <h1>Salom, {{ session['user'] }}!</h1>
+    <p>Qaysi hujjat turini yaratmoqchisiz?</p>
+    <div class="cards">
+      {% for key, label in doctypes %}
+        <a class="card" href="{{ url_for('generate_route', doc_type=key) }}">
+          <div class="ic">📄</div>
+          <h3>{{ label }}</h3>
+          <p>Yaratish uchun bosing</p>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</body>
+</html>

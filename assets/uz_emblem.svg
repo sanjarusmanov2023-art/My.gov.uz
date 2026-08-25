@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="140" height="140" viewBox="0 0 280 280">
+  <!-- outer ring -->
+  <circle cx="140" cy="140" r="132" fill="#ffffff" stroke="#0a4d8c" stroke-width="3"/>
+  <!-- sun -->
+  <circle cx="140" cy="92" r="26" fill="#e8a200"/>
+  <g stroke="#e8a200" stroke-width="4" stroke-linecap="round">
+    <line x1="140" y1="40" x2="140" y2="56"/>
+    <line x1="186" y1="92" x2="170" y2="92"/>
+    <line x1="94" y1="92" x2="110" y2="92"/>
+    <line x1="176" y1="56" x2="166" y2="66"/>
+    <line x1="104" y1="56" x2="114" y2="66"/>
+    <line x1="176" y1="128" x2="166" y2="118"/>
+    <line x1="104" y1="128" x2="114" y2="118"/>
+  </g>
+  <!-- bird (Huma) stylized -->
+  <path d="M140 120
+           C 120 120, 96 132, 96 150
+           C 110 142, 128 142, 140 150
+           C 152 142, 170 142, 184 150
+           C 184 132, 160 120, 140 120 Z"
+        fill="#1a6fb5"/>
+  <path d="M140 150 L140 200" stroke="#1a6fb5" stroke-width="4"/>
+  <!-- mountains -->
+  <path d="M70 210 L110 180 L150 210 L190 180 L210 210 Z" fill="#0a4d8c"/>
+  <!-- wheat (left) -->
+  <g fill="#e8a200" stroke="#e8a000" stroke-width="1">
+    <ellipse cx="54" cy="200" rx="9" ry="16"/>
+    <ellipse cx="44" cy="188" rx="8" ry="14" transform="rotate(-20 44 188)"/>
+    <ellipse cx="62" cy="188" rx="8" ry="14" transform="rotate(20 62 188)"/>
+  </g>
+  <!-- cotton (right) -->
+  <g fill="#f4f4f4" stroke="#cfcfcf" stroke-width="1">
+    <circle cx="222" cy="196" r="10"/>
+    <circle cx="212" cy="206" r="9"/>
+    <circle cx="232" cy="206" r="9"/>
+    <circle cx="222" cy="216" r="9"/>
+    <circle cx="222" cy="206" r="6" fill="#e8a200"/>
+  </g>
+  <!-- ribbon -->
+  <path d="M70 240 L210 240 L196 252 L84 252 Z" fill="#1a6fb5"/>
+</svg>

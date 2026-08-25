@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kirish</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: 'Segoe UI', Arial, sans-serif; background:#f3f5f8; color:#222; }
+  .topbar { background:#1a6fb5; color:#fff; padding:14px 20px; font-size:18px; font-weight:600; }
+  .topbar small { font-weight:400; opacity:.85; }
+  .wrap { max-width:420px; margin:60px auto; background:#fff; border-radius:8px; padding:30px; box-shadow:0 2px 12px rgba(0,0,0,.08); }
+  h2 { margin-top:0; color:#1a6fb5; }
+  input[type=text], input[type=password] { width:100%; padding:11px; margin:8px 0 16px; border:1px solid #ccd; border-radius:5px; font-size:15px; }
+  button { width:100%; background:#1a6fb5; color:#fff; border:0; padding:12px; border-radius:5px; font-size:16px; cursor:pointer; }
+  button:hover { background:#155a95; }
+  .msg { color:#c0392b; margin-bottom:10px; }
+</style>
+</head>
+<body>
+  <div class="topbar">🏛 Hujjat Generator <small>— shaxsiy kabinet</small></div>
+  <div class="wrap">
+    <h2>Admin kirish</h2>
+    {% with msgs = get_flashed_messages() %}
+      {% if msgs %}<div class="msg">{{ msgs[0] }}</div>{% endif %}
+    {% endwith %}
+    <form method="post">
+      <label>Login</label>
+      <input type="text" name="username" required>
+      <label>Parol</label>
+      <input type="password" name="password" required>
+      <button type="submit">Kirish</button>
+    </form>
+  </div>
+</body>
+</html>
