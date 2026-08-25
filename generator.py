@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""PDF generator for 3 government-style document types.
+"""PDF generator for 4 government-style document types.
 Languages: uz / ru / en. Each generated PDF embeds a QR code."""
-import io, os, random, string, datetime
+import io, os, random, string, datetime, glob
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
 from reportlab.lib import colors
@@ -13,19 +13,21 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 import qrcode
 from PIL import Image as PILImage
-from logos import mygov_logo, uz_emblem
 
-# --- Fonts (support Latin + Cyrillic) ---
+# --- Fonts: use DejaVuSans (ships with reportlab deps, supports Latin+Cyrillic) ---
+# This works identically on local Windows and on Render (Linux) — no system font dependency.
 FONT = 'Helvetica'
-FONT_BOLD = 'Helvetica-Bold'
-for cand, cand_b in ((r'C:\Windows\Fonts\arial.ttf', r'C:\Windows\Fonts\arialbd.ttf'),
-                     (r'C:\Windows\Fonts\calibri.ttf', r'C:\Windows\Fonts\calibrib.ttf')):
-    try:
-        pdfmetrics.registerFont(TTFont('UZ', cand)); FONT='UZ'
-        pdfmetrics.registerFont(TTFont('UZ-Bold', cand_b)); FONT_BOLD='UZ-Bold'
-        break
-    except Exception:
-        pass
+for pattern in ('*/site-packages/reportlab/fonts/DejaVuSans.ttf',
+               '*/reportlab/fonts/DejaVuSans.ttf',
+               'C:/Windows/Fonts/arial.ttf'):
+    matches = glob.glob(pattern, recursive=True)
+    if matches:
+        try:
+            pdfmetrics.registerFont(TTFont('UZ', matches[0]))
+            FONT = 'UZ'
+            break
+        except Exception:
+            pass
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 
