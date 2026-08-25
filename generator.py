@@ -56,15 +56,22 @@ def _assets():
     base = os.path.join(BASE, 'assets')
     return os.path.join(base, 'logo.png'), os.path.join(base, 'emblem.png')
 
-def make_header(ministry_html: str):
-    """Returns a Table with: my.gov.uz logo (left) | emblem (center) | ministry name (right)."""
+def make_header(ministry_html, now=None):
+    """Returns a Table with: my.gov.uz logo (left) | emblem (center) | ministry name (right).
+    Optionally includes timestamp row above and a separator line below."""
+    from reportlab.platypus import HRFlowable
     logo_path, emblem_path = _assets()
     logo = RLImage(logo_path, width=34*mm, height=12*mm) if os.path.exists(logo_path) else Spacer(1, 12*mm)
     emb = RLImage(emblem_path, width=18*mm, height=18*mm) if os.path.exists(emblem_path) else Spacer(1, 18*mm)
     mst = _styles()['ministry']
     mpara = Paragraph(ministry_html, mst)
-    t = Table([[logo, emb, mpara]], colWidths=[40*mm, 22*mm, 100*mm])
-    t.setStyle(TableStyle([
+    elems = []
+    if now:
+        tst = _styles()['header']
+        elems.append(Paragraph(now, tst))
+        elems.append(HRFlowable(width='100%', thickness=0.6, color=colors.grey, spaceBefore=2, spaceAfter=4))
+    header_tbl = Table([[logo, emb, mpara]], colWidths=[40*mm, 22*mm, 100*mm])
+    header_tbl.setStyle(TableStyle([
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
         ('ALIGN', (0,0), (0,0), 'LEFT'),
         ('ALIGN', (1,0), (1,0), 'CENTER'),
@@ -74,7 +81,9 @@ def make_header(ministry_html: str):
         ('TOPPADDING', (0,0), (-1,-1), 0),
         ('BOTTOMPADDING', (0,0), (-1,-1), 0),
     ]))
-    return t
+    elems.append(header_tbl)
+    elems.append(HRFlowable(width='100%', thickness=0.6, color=colors.grey, spaceBefore=4, spaceAfter=6))
+    return elems
 
 
 def gen_doc_number():
@@ -159,13 +168,11 @@ def generate_qaydvarag(data, lang='uz'):
     doc = SimpleDocTemplate(buf, pagesize=A4, leftMargin=18*mm, rightMargin=18*mm,
                             topMargin=14*mm, bottomMargin=14*mm, title="Qayd varag'i")
     story = []
-    story.append(Paragraph(now, st['header']))
+    story.extend(make_header(T['ministry'], now))
     story.append(Paragraph("№ " + docno, st['docno']))
     story.append(Paragraph(T['appno'] + " " + (d.get('app_no') or ''), st['docno']))
     story.append(Paragraph(T['issued'] + " " + (d.get('issued_to') or d.get('head_name','')), st['docno']))
     story.append(Paragraph(T['pinfl'] + " " + (d.get('pinfl') or d.get('head_stir','')), st['docno']))
-    story.append(Spacer(1,6))
-    story.append(make_header(T['ministry']))
     story.append(Spacer(1,6))
     story.append(Paragraph(T['title'], st['title']))
     story.append(Spacer(1,8))
@@ -212,14 +219,12 @@ def generate_employment(data, lang='uz'):
     doc = SimpleDocTemplate(buf, pagesize=A4, leftMargin=18*mm, rightMargin=18*mm,
                             topMargin=14*mm, bottomMargin=14*mm, title="Ish staji")
     story=[]
-    story.append(Paragraph(now, st['header']))
+    story.extend(make_header(T['ministry'], now))
     story.append(Paragraph("№ " + docno, st['docno']))
     story.append(Paragraph(T['appno'] + " " + (data.get('app_no') or ''), st['docno']))
     story.append(Paragraph(T['issued'] + " " + (data.get('issued_to') or ''), st['docno']))
     story.append(Paragraph(T['pinfl'] + " " + (data.get('pinfl') or ''), st['docno']))
     story.append(Spacer(1,6))
-    story.append(Paragraph(T['ministry'], st['ministry']))
-    story.append(Spacer(1,8))
     story.append(Paragraph(T['title'], st['title']))
     story.append(Spacer(1,8))
     header = [Paragraph(f"<b>{c}</b>", st['labb']) for c in T['cols']]
@@ -269,14 +274,12 @@ def generate_salary(data, lang='en'):
     doc = SimpleDocTemplate(buf, pagesize=A4, leftMargin=16*mm, rightMargin=16*mm,
                             topMargin=14*mm, bottomMargin=14*mm, title="Salary certificate")
     story=[]
-    story.append(Paragraph(now, st['header']))
+    story.extend(make_header(T['ministry'], now))
     story.append(Paragraph("№ " + docno, st['docno']))
     story.append(Paragraph("Document creation date: " + created, st['docno']))
     story.append(Paragraph("Application number: " + (data.get('app_no') or ''), st['docno']))
     story.append(Paragraph("Document issued: " + (data.get('issued_to') or ''), st['docno']))
     story.append(Paragraph("PINFL: " + (data.get('pinfl') or ''), st['docno']))
-    story.append(Spacer(1,6))
-    story.append(Paragraph(T['ministry'], st['ministry']))
     story.append(Spacer(1,8))
     story.append(Paragraph(T['title'], st['title']))
     story.append(Spacer(1,8))
