@@ -52,6 +52,31 @@ def make_qr(data: str) -> RLImage:
     buf.seek(0)
     return RLImage(buf, width=28*mm, height=28*mm)
 
+def _assets():
+    base = os.path.join(BASE, 'assets')
+    return os.path.join(base, 'logo.png'), os.path.join(base, 'emblem.png')
+
+def make_header(ministry_html: str):
+    """Returns a Table with: my.gov.uz logo (left) | emblem (center) | ministry name (right)."""
+    logo_path, emblem_path = _assets()
+    logo = RLImage(logo_path, width=34*mm, height=12*mm) if os.path.exists(logo_path) else Spacer(1, 12*mm)
+    emb = RLImage(emblem_path, width=18*mm, height=18*mm) if os.path.exists(emblem_path) else Spacer(1, 18*mm)
+    mst = _styles()['ministry']
+    mpara = Paragraph(ministry_html, mst)
+    t = Table([[logo, emb, mpara]], colWidths=[40*mm, 22*mm, 100*mm])
+    t.setStyle(TableStyle([
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('ALIGN', (0,0), (0,0), 'LEFT'),
+        ('ALIGN', (1,0), (1,0), 'CENTER'),
+        ('ALIGN', (2,0), (2,0), 'RIGHT'),
+        ('LEFTPADDING', (0,0), (-1,-1), 0),
+        ('RIGHTPADDING', (0,0), (-1,-1), 0),
+        ('TOPPADDING', (0,0), (-1,-1), 0),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 0),
+    ]))
+    return t
+
+
 def gen_doc_number():
     parts = [''.join(random.choices(string.hexdigits[:6].lower(), k=4)) for _ in range(6)]
     return '-'.join(parts)
@@ -140,7 +165,7 @@ def generate_qaydvarag(data, lang='uz'):
     story.append(Paragraph(T['issued'] + " " + (d.get('issued_to') or d.get('head_name','')), st['docno']))
     story.append(Paragraph(T['pinfl'] + " " + (d.get('pinfl') or d.get('head_stir','')), st['docno']))
     story.append(Spacer(1,6))
-    story.append(Paragraph(T['ministry'], st['ministry']))
+    story.append(make_header(T['ministry']))
     story.append(Spacer(1,6))
     story.append(Paragraph(T['title'], st['title']))
     story.append(Spacer(1,8))

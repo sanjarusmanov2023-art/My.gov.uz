@@ -112,7 +112,8 @@ def generate_route(doc_type):
             return redirect(url_for('generate_route', doc_type=doc_type))
         # store for verify
         DOCS[docno] = {'doc_type': doc_type, 'lang': lang,
-                      'created': datetime.datetime.now().isoformat(), 'data': data}
+                      'created': datetime.datetime.now().isoformat(), 'data': data,
+                      'check_code': docno[-4:]}
         # persist to disk cache
         cache_dir = os.path.join(BASE, 'cache')
         os.makedirs(cache_dir, exist_ok=True)
@@ -124,13 +125,26 @@ def generate_route(doc_type):
                          download_name=f'{doc_type}_{docno}.pdf')
     return render_template('generate.html', doc_type=doc_type, langs=LANGS)
 
-@app.route('/verify')
+@app.route('/verify', methods=['GET','POST'])
 def verify():
-    doc = request.args.get('doc')
+    doc = request.args.get('doc') or request.form.get('doc','')
     if not doc or doc not in DOCS:
         return render_template('verify.html', found=False)
     info = DOCS[doc]
-    return render_template('verify.html', found=True, info=info, doc=doc)
+    if request.method == 'POST':
+        code = request.form.get('code','').strip()
+        if code == info.get('check_code'):
+            # correct -> serve the PDF
+            cache_path = os.path.join(BASE, 'cache', doc + '.pdf')
+            if os.path.exists(cache_path):
+                return send_file(cache_path, mimetype='application/pdf',
+                                 as_attachment=True, download_name=f'{info["doc_type"]}_{doc}.pdf')
+            pdf_bytes, _ = generate(info['doc_type'], info['data'], info['lang'])
+            return send_file(io.BytesIO(pdf_bytes), mimetype='application/pdf',
+                             as_attachment=True, download_name=f'{info["doc_type"]}_{doc}.pdf')
+        else:
+            return render_template('verify.html', found=True, doc=doc, error='Kod noto\'g\'ri. Qaytadan urinib ko\'ring.')
+    return render_template('verify.html', found=True, doc=doc, info=info, error=None)
 
 @app.route('/health')
 def health():
