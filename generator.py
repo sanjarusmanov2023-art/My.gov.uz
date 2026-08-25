@@ -380,10 +380,14 @@ def generate_student(data, lang='uz'):
                             topMargin=14*mm, bottomMargin=14*mm, title="Talaba malumotnomasi")
     story = []
     story.extend(make_header(T['ministry'], now))
-    story.append(Paragraph("№ " + docno, st['docno']))
-    story.append(Paragraph(T['appno'] + " " + (d.get('app_no') or ''), st['docno']))
-    story.append(Paragraph(T['issued'] + " " + (d.get('fio') or ''), st['docno']))
-    story.append(Paragraph(T['pinfl'] + " " + (d.get('pinfl') or ''), st['docno']))
+    meta = Table([[
+        Paragraph("№ " + docno + "<br/>" + T['appno'] + " " + (d.get('app_no') or ''), st['docno']),
+        Paragraph(T['issued'] + " " + (d.get('fio') or '') + "<br/>" + T['pinfl'] + " " + (d.get('pinfl') or ''), st['docno']),
+    ]], colWidths=[92*mm, 92*mm])
+    meta.setStyle(TableStyle([('VALIGN',(0,0),(-1,-1),'TOP'),('ALIGN',(1,0),(1,0),'RIGHT'),
+        ('LEFTPADDING',(0,0),(-1,-1),0),('RIGHTPADDING',(0,0),(-1,-1),0),
+        ('TOPPADDING',(0,0),(-1,-1),0),('BOTTOMPADDING',(0,0),(-1,-1),0)]))
+    story.append(meta)
     story.append(Spacer(1,10))
     story.append(Paragraph(T['title'], st['title']))
     story.append(Paragraph(T['subtitle'], st['subtitle']))
@@ -402,8 +406,13 @@ def generate_student(data, lang='uz'):
     story.append(Spacer(1,8))
     story.append(Paragraph(T['note_line'], st['note']))
     story.append(Spacer(1,8))
-    story.append(make_qr(f"doc:{docno}"))
-    story.append(Paragraph(_legal_note(lang), st['note']))
+    qr = make_qr(f"doc:{docno}")
+    legal = Paragraph(_legal_note(lang), st['note'])
+    ft = Table([[legal, qr]], colWidths=[120*mm, 44*mm])
+    ft.setStyle(TableStyle([('VALIGN',(0,0),(-1,-1),'MIDDLE'),('ALIGN',(1,0),(1,0),'RIGHT'),
+        ('LEFTPADDING',(0,0),(-1,-1),0),('RIGHTPADDING',(0,0),(-1,-1),0),
+        ('TOPPADDING',(0,0),(-1,-1),0),('BOTTOMPADDING',(0,0),(-1,-1),0)]))
+    story.append(ft)
     story.append(Paragraph(f"[{docno[-4:]}]", st['note']))
     doc.build(story)
     buf.seek(0); return buf.getvalue(), docno
