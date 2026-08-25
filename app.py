@@ -7,7 +7,7 @@ import os, io, json, uuid, datetime
 from flask import (Flask, request, render_template, session, redirect,
                    url_for, send_file, abort, flash)
 from werkzeug.security import generate_password_hash, check_password_hash
-from generator import generate
+from generator import generate, set_qr_base_url
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__, template_folder=os.path.join(BASE, 'templates'))
@@ -107,7 +107,6 @@ def generate_route(doc_type):
                 i += 1
             data['salary_rows'] = rows
         try:
-            from generator import set_qr_base_url
             set_qr_base_url(request.host_url + "verify?doc=")
             pdf_bytes, docno = generate(doc_type, data, lang)
         except Exception as e:
