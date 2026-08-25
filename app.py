@@ -22,10 +22,10 @@ ADMIN_PASS_HASH = generate_password_hash(os.environ.get('ADMIN_PASS', 'admin123'
 DOCS = {}
 
 DOCTYPES = [
-    ('qaydvarag', 'QAYD VARAG\'I (yuridik shaxs)'),
-    ('employment', 'Ish staji haqida ma\'lumotnoma'),
-    ('salary', 'Maosh hisoboti (Certificate of Calculated Wages)'),
     ('student', 'Talaba ma\'lumotnomasi (O\'qish joyidan)'),
+    ('qaydvarag', 'Xususiy firma egasi uchun (QAYD VARAG\'I)'),
+    ('salary', 'Maosh hisoboti (Salary Certificate)'),
+    ('employment', 'Ish staji haqida ma\'lumotnoma (Work Experience)'),
 ]
 LANGS = [('uz','O\'zbekcha'),('ru','Русский'),('en','English')]
 

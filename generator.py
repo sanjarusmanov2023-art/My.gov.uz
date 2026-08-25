@@ -35,17 +35,17 @@ def _styles():
         kw.setdefault('fontName', FONT)
         return ParagraphStyle(name, parent=ss['Normal'], **kw)
     return {
-        'header': s('header', fontSize=8, leading=10, alignment=TA_CENTER),
-        'ministry': s('ministry', fontSize=9, leading=11, alignment=TA_CENTER),
-        'docno': s('docno', fontSize=8, leading=10),
-        'title': s('title', fontSize=13, leading=16, alignment=TA_CENTER),
-        'subtitle': s('subtitle', fontSize=10, leading=13, alignment=TA_CENTER),
-        'lab': s('lab', fontSize=8.5, leading=11),
-        'labb': s('labb', fontSize=8.5, leading=11),
-        'val': s('val', fontSize=8.5, leading=11),
+        'header': s('header', fontSize=10.5, leading=12, alignment=TA_CENTER),
+        'ministry': s('ministry', fontSize=10.5, leading=13, alignment=TA_CENTER),
+        'docno': s('docno', fontSize=10.5, leading=12),
+        'title': s('title', fontSize=10.5, leading=13, alignment=TA_CENTER, fontName=FONT_BOLD),
+        'subtitle': s('subtitle', fontSize=10.5, leading=13, alignment=TA_CENTER),
+        'lab': s('lab', fontSize=10.5, leading=13),
+        'labb': s('labb', fontSize=10.5, leading=13),
+        'val': s('val', fontSize=10.5, leading=13),
         'note': s('note', fontSize=7, leading=9),
         'bigcode': s('bigcode', fontSize=28, leading=30, alignment=TA_LEFT, fontName=FONT_BOLD),
-        'sec': s('sec', fontSize=9, leading=12, alignment=TA_CENTER),
+        'sec': s('sec', fontSize=10.5, leading=13, alignment=TA_CENTER),
     }
 
 # Base URL for QR codes (set per-request from app.py via set_qr_base_url)
@@ -72,19 +72,16 @@ def _assets():
 
 def make_header(ministry_html, now=None):
     """Returns a Table with: my.gov.uz logo (left) | emblem (center) | ministry name (right).
-    Optionally includes timestamp row above and a separator line below."""
+    Optionally includes timestamp row (top-right) and separator lines."""
     from reportlab.platypus import HRFlowable
     logo_path, emblem_path = _assets()
-    logo = RLImage(logo_path, width=34*mm, height=12*mm) if os.path.exists(logo_path) else Spacer(1, 12*mm)
-    emb = RLImage(emblem_path, width=18*mm, height=18*mm) if os.path.exists(emblem_path) else Spacer(1, 18*mm)
+    # Asl nisbatlarga yaqin: logo ~151x40 (3.77:1), gerb ~96x96 (kvadrat, kattaroq)
+    logo = RLImage(logo_path, width=40*mm, height=11*mm) if os.path.exists(logo_path) else Spacer(1, 11*mm)
+    emb = RLImage(emblem_path, width=24*mm, height=24*mm) if os.path.exists(emblem_path) else Spacer(1, 24*mm)
     mst = _styles()['ministry']
     mpara = Paragraph(ministry_html, mst)
     elems = []
-    if now:
-        tst = _styles()['header']
-        elems.append(Paragraph(now, tst))
-        elems.append(HRFlowable(width='100%', thickness=0.6, color=colors.grey, spaceBefore=2, spaceAfter=4))
-    header_tbl = Table([[logo, emb, mpara]], colWidths=[40*mm, 22*mm, 100*mm])
+    header_tbl = Table([[logo, emb, mpara]], colWidths=[44*mm, 26*mm, 93*mm])
     header_tbl.setStyle(TableStyle([
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
         ('ALIGN', (0,0), (0,0), 'LEFT'),
@@ -96,6 +93,12 @@ def make_header(ministry_html, now=None):
         ('BOTTOMPADDING', (0,0), (-1,-1), 0),
     ]))
     elems.append(header_tbl)
+    if now:
+        # timestamp top-right (asl kabi)
+        tst = _styles()['header']
+        ts_tbl = Table([[Spacer(1,1), Paragraph(now, tst)]], colWidths=[120*mm, 43*mm])
+        ts_tbl.setStyle(TableStyle([('ALIGN',(1,0),(1,0),'RIGHT'),('LEFTPADDING',(0,0),(-1,-1),0),('RIGHTPADDING',(0,0),(-1,-1),0),('TOPPADDING',(0,0),(-1,-1),0),('BOTTOMPADDING',(0,0),(-1,-1),0)]))
+        elems.append(ts_tbl)
     elems.append(HRFlowable(width='100%', thickness=0.6, color=colors.grey, spaceBefore=4, spaceAfter=6))
     return elems
 
@@ -118,8 +121,10 @@ def _legal_note(lang):
                 "To verify the document, enter its unique number on repo.gov.uz or scan the QR code "
                 "with a mobile device.")
     return ("Mazkur hujjat Vazirlar Mahkamasining 2017 yil 15 sentyabrdagi 728-son qaroriga muvofiq "
-            "Yagona interaktiv davlat xizmatlari portalida shakllantirilgan elektron hujjatning nusxasi. "
-            "Haqiqiyligini repo.gov.uz saytida noyob raqamni kiritib yoki QR-kodni skaner qilib tekshirish mumkin.")
+            "Yagona interaktiv davlat xizmatlari portalida shakllantirilgan elektron hujjatning nusxasi bo'lib, "
+            "davlat organlari tomonidan ushbu hujjatni qabul qilishni rad etishlari qat'iyan taqiqlanadi. "
+            "Hujjat haqiqiyligini repo.gov.uz veb-saytida hujjatning noyob raqamini kiritib yoki "
+            "mobil telefon yordamida QR-kodni skaner qilish orqali tekshirish mumkin.")
 
 # ===================== TYPE 1: QAYD VARAG'I (legal entity) =====================
 def generate_qaydvarag(data, lang='uz'):
@@ -183,6 +188,7 @@ def generate_qaydvarag(data, lang='uz'):
                             topMargin=14*mm, bottomMargin=14*mm, title="Qayd varag'i")
     story = []
     story.extend(make_header(T['ministry'], now))
+    story.append(Spacer(1, 14*mm))  # asl kabi header'dan keyin bo'shliq
     story.append(Paragraph("№ " + docno, st['docno']))
     story.append(Paragraph(T['appno'] + " " + (d.get('app_no') or ''), st['docno']))
     story.append(Paragraph(T['issued'] + " " + (d.get('issued_to') or d.get('head_name','')), st['docno']))
@@ -203,17 +209,16 @@ def generate_qaydvarag(data, lang='uz'):
     block(T['sec3'], rows3)
     block(T['sec4'], rows4)
     story.append(Spacer(1,6))
+    code_para = Paragraph(docno[-4:], st['bigcode'])
     qr = make_qr(docno)
-    code_para = Paragraph("[" + docno[-4:] + "]", st['note'])
-    qr_cell = Table([[qr],[code_para]], colWidths=[28*mm])
-    qr_cell.setStyle(TableStyle([('ALIGN',(0,0),(0,0),'CENTER'),('ALIGN',(0,1),(0,1),'CENTER'),
-        ('TOPPADDING',(0,0),(-1,-1),0),('BOTTOMPADDING',(0,0),(-1,-1),0)]))
-    legal = Paragraph(_legal_note(lang), st['note'])
-    ft = Table([[legal, qr_cell]], colWidths=[120*mm, 44*mm])
-    ft.setStyle(TableStyle([('VALIGN',(0,0),(-1,-1),'MIDDLE'),('ALIGN',(1,0),(1,0),'RIGHT'),
+    ft = Table([[code_para, qr]], colWidths=[44*mm, 44*mm])
+    ft.setStyle(TableStyle([('VALIGN',(0,0),(0,0),'MIDDLE'),('ALIGN',(0,0),(0,0),'LEFT'),
+        ('VALIGN',(1,0),(1,0),'MIDDLE'),('ALIGN',(1,0),(1,0),'RIGHT'),
         ('LEFTPADDING',(0,0),(-1,-1),0),('RIGHTPADDING',(0,0),(-1,-1),0),
         ('TOPPADDING',(0,0),(-1,-1),0),('BOTTOMPADDING',(0,0),(-1,-1),0)]))
+    legal = Paragraph(_legal_note(lang), st['note'])
     story.append(ft)
+    story.append(legal)
     doc.build(story)
     buf.seek(0)
     return buf.getvalue(), docno
@@ -301,23 +306,29 @@ def generate_salary(data, lang='en'):
     buf = io.BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=A4, leftMargin=16*mm, rightMargin=16*mm,
                             topMargin=14*mm, bottomMargin=14*mm, title="Salary certificate")
+    from reportlab.platypus import PageBreak
     story=[]
     story.extend(make_header(T['ministry'], now))
-    story.append(Paragraph("№ " + docno, st['docno']))
-    story.append(Paragraph("Document creation date: " + created, st['docno']))
-    story.append(Paragraph("Application number: " + (data.get('app_no') or ''), st['docno']))
-    story.append(Paragraph("Document issued: " + (data.get('issued_to') or ''), st['docno']))
-    story.append(Paragraph("PINFL: " + (data.get('pinfl') or ''), st['docno']))
-    story.append(Spacer(1,8))
+    # metadata row (left: №, date, app; right: issued, PINFL) — asl kabi bir qatorda
+    meta = Table([[
+        Paragraph("№ " + docno + "<br/>Document creation date: " + created + "<br/>Application number: " + (data.get('app_no') or ''), st['docno']),
+        Paragraph("Document issued: " + (data.get('issued_to') or '') + "<br/>PINFL: " + (data.get('pinfl') or ''), st['docno']),
+    ]], colWidths=[92*mm, 92*mm])
+    meta.setStyle(TableStyle([('VALIGN',(0,0),(-1,-1),'TOP'),('ALIGN',(1,0),(1,0),'RIGHT'),
+        ('LEFTPADDING',(0,0),(-1,-1),0),('RIGHTPADDING',(0,0),(-1,-1),0),
+        ('TOPPADDING',(0,0),(-1,-1),0),('BOTTOMPADDING',(0,0),(-1,-1),0)]))
+    story.append(meta)
+    story.append(Spacer(1,10))
     story.append(Paragraph(T['title'], st['title']))
-    story.append(Spacer(1,8))
+    story.append(Spacer(1,10))
     story.append(Paragraph(T['name'] + " " + (data.get('issued_to') or ''), st['lab']))
     story.append(Paragraph(T['prsa'] + " " + (data.get('pinfl') or ''), st['lab']))
     story.append(Spacer(1,4))
     story.append(Paragraph(T['intro'], st['lab']))
     story.append(Paragraph(f"{T['total']} {data.get('total_salary','')}", st['lab']))
     story.append(Paragraph(f"{T['tax']} {data.get('income_tax','')}", st['lab']))
-    story.append(Spacer(1,6))
+    story.append(PageBreak())
+    # page 2: salary table
     header=[Paragraph(f"{c}", st['labb']) for c in T['cols']]
     body=[]
     for r in rows:
@@ -413,8 +424,10 @@ def generate_student(data, lang='uz'):
     buf = io.BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=A4, leftMargin=18*mm, rightMargin=18*mm,
                             topMargin=14*mm, bottomMargin=14*mm, title="Talaba malumotnomasi")
+    from reportlab.platypus import PageBreak
     story = []
     story.extend(make_header(T['ministry'], now))
+    story.append(Spacer(1, 14*mm))  # asl kabi header'dan keyin bo'shliq
     meta = Table([[
         Paragraph("№ " + docno + "<br/>" + T['appno'] + " " + (d.get('app_no') or ''), st['docno']),
         Paragraph(T['issued'] + " " + (d.get('fio') or '') + "<br/>" + T['pinfl'] + " " + (d.get('pinfl') or ''), st['docno']),
@@ -449,7 +462,6 @@ def generate_student(data, lang='uz'):
         ('VALIGN',(1,0),(1,0),'MIDDLE'),('ALIGN',(1,0),(1,0),'RIGHT'),
         ('LEFTPADDING',(0,0),(-1,-1),0),('RIGHTPADDING',(0,0),(-1,-1),0),
         ('TOPPADDING',(0,0),(-1,-1),0),('BOTTOMPADDING',(0,0),(-1,-1),0)]))
-    # legal text below the code/qr row (left aligned, full width)
     legal = Paragraph(_legal_note(lang), st['note'])
     story.append(ft)
     story.append(legal)
