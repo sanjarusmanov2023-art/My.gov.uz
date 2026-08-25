@@ -309,6 +309,105 @@ def generate_salary(data, lang='en'):
     doc.build(story)
     buf.seek(0); return buf.getvalue(), docno
 
+# ===================== TYPE 4: TALABA MA'LUMOTNOMASI (student certificate) =====================
+def generate_student(data, lang='uz'):
+    st = _styles()
+    docno = data.get('doc_no') or gen_doc_number()
+    now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    created = data.get('created') or datetime.datetime.now().strftime('%Y-%m-%d')
+    T = {
+        'uz': dict(ministry="O'zbekiston Respublikasi<br/>Oliy ta'lim, fan va<br/>innovatsiyalar vazirligi",
+                   title="O'QISH JOYIDAN MA'LUMOTNOMA",
+                   subtitle="СПРАВКА С МЕСТА УЧЕБЫ",
+                   issued="Hujjat berilgan:", pinfl="JShShIR:", appno="Ariza raqami:",
+                   rows=[
+                       ("F.I.O. / Ф.И.О.", "fio"),
+                       ("JSH ShIR / ПИН ФЛ", "pinfl"),
+                       ("Tug'ilgan sanasi / Дата рождения", "birth"),
+                       ("Fuqaroligi / Гражданство", "citizenship"),
+                       ("Ta'lim turi / Тип образования", "edu_type"),
+                       ("Ta'lim shakli / Форма обучения", "edu_form"),
+                       ("Qabul turi / Тип приема", "admission"),
+                       ("O'qishga kirgan yili / Год зачисления", "enroll_year"),
+                       ("Oliy ta'lim muassasasi / Высшее учебное заведение", "university"),
+                       ("Fakultet / Факультет", "faculty"),
+                       ("Yo'nalish / Направление", "direction"),
+                       ("O'quv kursi / Курс обучения", "course"),
+                   ],
+                   note_line="Ma'lumot so'ralgan joyga taqdim etish uchun berildi."),
+        'ru': dict(ministry="Республика Узбекистан<br/>Министерство высшего образования,<br/>науки и инноваций",
+                   title="СПРАВКА С МЕСТА УЧЕБЫ",
+                   subtitle="O'QISH JOYIDAN MA'LUMOTNOMA",
+                   issued="Документ выдан:", pinfl="ПИНФЛ:", appno="Номер заявки:",
+                   rows=[
+                       ("Ф.И.О.", "fio"),
+                       ("ПИНФЛ", "pinfl"),
+                       ("Дата рождения", "birth"),
+                       ("Гражданство", "citizenship"),
+                       ("Тип образования", "edu_type"),
+                       ("Форма обучения", "edu_form"),
+                       ("Тип приема", "admission"),
+                       ("Год зачисления", "enroll_year"),
+                       ("Высшее учебное заведение", "university"),
+                       ("Факультет", "faculty"),
+                       ("Направление", "direction"),
+                       ("Курс обучения", "course"),
+                   ],
+                   note_line="Справка выдана для предоставления по месту требования."),
+        'en': dict(ministry="Republic of Uzbekistan<br/>Ministry of Higher Education,<br/>Science and Innovation",
+                   title="CERTIFICATE FROM PLACE OF STUDY",
+                   subtitle="СПРАВКА С МЕСТА УЧЕБЫ",
+                   issued="Document issued:", pinfl="PINFL:", appno="Application No.:",
+                   rows=[
+                       ("Full name", "fio"),
+                       ("PINFL", "pinfl"),
+                       ("Date of birth", "birth"),
+                       ("Citizenship", "citizenship"),
+                       ("Type of education", "edu_type"),
+                       ("Form of education", "edu_form"),
+                       ("Type of admission", "admission"),
+                       ("Year of enrollment", "enroll_year"),
+                       ("Higher education institution", "university"),
+                       ("Faculty", "faculty"),
+                       ("Field of study", "direction"),
+                       ("Year of study", "course"),
+                   ],
+                   note_line="Issued for submission to the requesting party."),
+    }[lang]
+    d = data
+    buf = io.BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=A4, leftMargin=18*mm, rightMargin=18*mm,
+                            topMargin=14*mm, bottomMargin=14*mm, title="Talaba malumotnomasi")
+    story = []
+    story.extend(make_header(T['ministry'], now))
+    story.append(Paragraph("№ " + docno, st['docno']))
+    story.append(Paragraph(T['appno'] + " " + (d.get('app_no') or ''), st['docno']))
+    story.append(Paragraph(T['issued'] + " " + (d.get('fio') or ''), st['docno']))
+    story.append(Paragraph(T['pinfl'] + " " + (d.get('pinfl') or ''), st['docno']))
+    story.append(Spacer(1,10))
+    story.append(Paragraph(T['title'], st['title']))
+    story.append(Paragraph(T['subtitle'], st['subtitle']))
+    story.append(Spacer(1,10))
+    tdata = []
+    for label, key in T['rows']:
+        val = d.get(key, '')
+        if key == 'birth' and not val:
+            val = d.get('birth_date','')
+        tdata.append([Paragraph(f"<b>{label}</b>", st['labb']), Paragraph(str(val), st['val'])])
+    t = Table(tdata, colWidths=[95*mm, 69*mm])
+    t.setStyle(TableStyle([('FONTNAME',(0,0),(-1,-1),FONT),('GRID',(0,0),(-1,-1),0.4,colors.lightgrey),
+        ('VALIGN',(0,0),(-1,-1),'TOP'),('TOPPADDING',(0,0),(-1,-1),4),('BOTTOMPADDING',(0,0),(-1,-1),4),
+        ('LEFTPADDING',(0,0),(-1,-1),6),('RIGHTPADDING',(0,0),(-1,-1),6)]))
+    story.append(t)
+    story.append(Spacer(1,8))
+    story.append(Paragraph(T['note_line'], st['note']))
+    story.append(Spacer(1,8))
+    story.append(make_qr(f"doc:{docno}"))
+    story.append(Paragraph(_legal_note(lang), st['note']))
+    story.append(Paragraph(f"[{docno[-4:]}]", st['note']))
+    doc.build(story)
+    buf.seek(0); return buf.getvalue(), docno
+
 def generate(doc_type, data, lang='uz'):
     if doc_type == 'qaydvarag':
         return generate_qaydvarag(data, lang)
@@ -316,4 +415,6 @@ def generate(doc_type, data, lang='uz'):
         return generate_employment(data, lang)
     if doc_type == 'salary':
         return generate_salary(data, lang)
+    if doc_type == 'student':
+        return generate_student(data, lang)
     raise ValueError("unknown doc_type")

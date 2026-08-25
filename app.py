@@ -25,6 +25,7 @@ DOCTYPES = [
     ('qaydvarag', 'QAYD VARAG\'I (yuridik shaxs)'),
     ('employment', 'Ish staji haqida ma\'lumotnoma'),
     ('salary', 'Maosh hisoboti (Certificate of Calculated Wages)'),
+    ('student', 'Talaba ma\'lumotnomasi (O\'qish joyidan)'),
 ]
 LANGS = [('uz','O\'zbekcha'),('ru','Русский'),('en','English')]
 

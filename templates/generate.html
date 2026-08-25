@@ -91,6 +91,17 @@ function addSal(){ const c=document.getElementById('sal'); const i=c.children.le
         <label>Ariza raqami</label><input type="text" name="app_no">
         <fieldset><legend>Oylik qatorlar</legend><div id="sal"></div><button type="button" class="addbtn" onclick="addSal()">+ Oylik qator qo'shish</button></fieldset>
       </div>
+
+      {% elif doc_type=='student' %}
+      <div class="box">
+        <div class="row"><div><label>F.I.O. (ism familya otasining ismi)</label><input type="text" name="fio"></div><div><label>JShShIR / PINFL</label><input type="text" name="pinfl"></div></div>
+        <div class="row"><div><label>Tug'ilgan sanasi</label><input type="text" name="birth"></div><div><label>Fuqaroligi</label><input type="text" name="citizenship" value="O'zbekiston Respublikasi fuqarosi"></div></div>
+        <div class="row"><div><label>Ta'lim turi</label><input type="text" name="edu_type" value="Bakalavr"></div><div><label>Ta'lim shakli</label><input type="text" name="edu_form" value="Kunduzgi"></div></div>
+        <div class="row"><div><label>Qabul turi</label><input type="text" name="admission" value="To'lov-shartnoma"></div><div><label>O'qishga kirgan yili</label><input type="text" name="enroll_year"></div></div>
+        <div class="row"><div><label>Oliy ta'lim muassasasi</label><input type="text" name="university"></div><div><label>Fakultet</label><input type="text" name="faculty"></div></div>
+        <div class="row"><div><label>Yo'nalish</label><input type="text" name="direction"></div><div><label>O'quv kursi</label><input type="text" name="course"></div></div>
+        <label>Ariza raqami</label><input type="text" name="app_no">
+      </div>
       {% endif %}
 
       <button class="gen" type="submit">📄 PDF yaratish va yuklab olish</button>
